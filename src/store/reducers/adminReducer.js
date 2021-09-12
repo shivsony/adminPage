@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { GET_USERS_LIST, DELETE_USERS_BY_IDS } from '../actionTypes/adminActionType';
+import { GET_USERS_LIST, DELETE_USERS_BY_IDS, UPDATE_THE_USER } from '../actionTypes/adminActionType';
 
 
 const initialState = {
@@ -14,6 +14,9 @@ export function admin(state = initialState, action){
         break;
       case DELETE_USERS_BY_IDS:
         draft.userList = draft.userList.filter(user => !action.payload.includes(user.id));
+        break;
+      case UPDATE_THE_USER:
+        draft.userList[draft.userList.findIndex(user => user.id === action.payload.id)] = action.payload;
         break;
       default:
         return state;

@@ -31,3 +31,12 @@ export const deleteUsers = () => {
     throw error;
   }
 }
+
+export const updateAuser = () => {
+  try {
+    const response = {status: 200}; // await api.PUT('update');
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

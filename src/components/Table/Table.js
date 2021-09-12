@@ -14,11 +14,8 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
-import FilterListIcon from '@material-ui/icons/FilterList';
 
 import MainPagination from '../MainPagination/MainPaginatio';
 
@@ -47,6 +44,12 @@ function stableSort(array, comparator) {
   });
   return stabilizedThis.map((el) => el[0]);
 }
+
+const renderColumn = (index,  _, colFields, idKey) => {
+  const { id, render, } = colFields;
+  if (render) return render(_[id], index, idKey);
+  return _[id];
+};
 
 function EnhancedTableHead(props) {
   const { classes, onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, tableHead } = props;
@@ -92,7 +95,7 @@ function EnhancedTableHead(props) {
 }
 
 EnhancedTableHead.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object,
   numSelected: PropTypes.number.isRequired,
   onRequestSort: PropTypes.func.isRequired,
   onSelectAllClick: PropTypes.func.isRequired,
@@ -193,15 +196,19 @@ const useStyles = makeStyles((theme) => ({
       overflowX:'auto',
     },
   },
+  saveButton: {
+    padding: 10,
+    cursor: 'pointer',
+  }
 }));
 
-export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRows }) {
+export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRows, handleSaveEditedData, idKey='id', handleEditRow, editRowIndex }) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  const dense = false;
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const handleRequestSort = (event, property) => {
@@ -250,10 +257,6 @@ export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRow
     setSelected([]);
   };
 
-  // const handleChangeDense = (event) => {
-  //   setDense(event.target.checked);
-  // };
-
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, tableData.length - page * rowsPerPage);
@@ -261,8 +264,15 @@ export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRow
     e.stopPropagation();
     handleDeleteRows([ids]);
   }
-  const handleEdit = (e) => {
+  const handleEdit = (e, index, data) => {
     e.stopPropagation();
+    handleEditRow && handleEditRow(index, data);
+  }
+
+  const handleSave = e => {
+    e.stopPropagation();
+    handleEditRow && handleEditRow(null);
+    handleSaveEditedData();
   }
 
   return (
@@ -309,22 +319,35 @@ export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRow
                           inputProps={{ 'aria-labelledby': labelId }}
                         />
                       </TableCell>
-                      <TableCell component="th" id={labelId} scope="row" padding="none">
-                        {row.name}
-                      </TableCell>
-                      <TableCell align="left" padding="none">{row.email}</TableCell>
-                      <TableCell align="left" padding="none">{row.role}</TableCell>
+                      {tableHead.map((column, i) => {
+                        return i !== tableHead.length -1 && (
+                          <TableCell
+                            align="left" padding="none"
+                            key={`${row[idKey]}_serial_${i}`}
+                          >
+                            {renderColumn(index, row, column, idKey)}
+                          </TableCell>
+                        );
+                      })}
                       <TableCell align="left" padding="none">
+                      {editRowIndex === index ? (
+                        <span onClick={(e) => handleSave(e)} className={classes.saveButton}>Save</span>
+                        ) :(
                         <Tooltip title="Delete">
-                          <IconButton onClick={handleEdit} aria-label="edit">
+                          <IconButton onClick={(e)=>handleEdit(e, index, row)} aria-label="edit">
                             <EditIcon />
                           </IconButton>
                         </Tooltip>
+                        )}
+                        {editRowIndex === index ? (
+                          <span onClick={(e)=>handleEdit(e, null, {})} className={classes.saveButton}>Cancel</span>
+                        ) :(
                         <Tooltip title="Delete">
                           <IconButton onClick={(e) => handleDelete(e, row.id)} aria-label="delete">
                             <DeleteIcon />
                           </IconButton>
                         </Tooltip>
+                        )}
                       </TableCell>
                     </TableRow>
                   );
@@ -352,3 +375,13 @@ export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRow
     </div>
   );
 }
+
+EnhancedTable.propTypes = {
+  classes: PropTypes.object,
+  tableHead: PropTypes.array.isRequired,
+  tableData: PropTypes.array.isRequired,
+  handleDeleteRows: PropTypes.func.isRequired,
+  handleSaveEditedData: PropTypes.func.isRequired,
+  handleEditRow: PropTypes.func,
+  editRowIndex: PropTypes.number,
+};

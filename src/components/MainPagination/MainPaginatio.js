@@ -22,7 +22,7 @@ function MainPagination({ count, page, rowsPerPage, onPageChange }) {
 }
 
 MainPagination.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object,
   count: PropTypes.number.isRequired,
   rowsPerPage: PropTypes.number.isRequired,
   onPageChange: PropTypes.func.isRequired,
