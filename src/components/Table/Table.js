@@ -124,7 +124,12 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected } = props;
+  const { deleteAll, selected, setSelected } = props;
+  const numSelected = selected.length;
+  const deleteSelected = () => {
+    deleteAll(selected)
+    setSelected([]);
+  }
 
   return (
     <Toolbar
@@ -135,7 +140,7 @@ const EnhancedTableToolbar = (props) => {
       {numSelected > 0 && (
         <span>
           <Tooltip title="Delete selected items">
-            <IconButton aria-label="delete">
+            <IconButton aria-label="delete" onClick={deleteSelected}>
               <DeleteIcon />
             </IconButton>
           </Tooltip>
@@ -147,7 +152,7 @@ const EnhancedTableToolbar = (props) => {
 };
 
 EnhancedTableToolbar.propTypes = {
-  numSelected: PropTypes.number.isRequired,
+  selected: PropTypes.array,
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -183,7 +188,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function EnhancedTable({ tableHead, tableData=[] }) {
+export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRows }) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('calories');
@@ -245,8 +250,9 @@ export default function EnhancedTable({ tableHead, tableData=[] }) {
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, tableData.length - page * rowsPerPage);
-  const handleDelete = (e) => {
+  const handleDelete = (e, ids) => {
     e.stopPropagation();
+    handleDeleteRows([ids]);
   }
   const handleEdit = (e) => {
     e.stopPropagation();
@@ -255,7 +261,6 @@ export default function EnhancedTable({ tableHead, tableData=[] }) {
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        {/* <EnhancedTableToolbar numSelected={selected.length} /> */}
         <TableContainer>
           <Table
             className={classes.table}
@@ -308,7 +313,7 @@ export default function EnhancedTable({ tableHead, tableData=[] }) {
                           </IconButton>
                         </Tooltip>
                         <Tooltip title="Delete">
-                          <IconButton onClick={handleDelete} aria-label="delete">
+                          <IconButton onClick={(e) => handleDelete(e, row.id)} aria-label="delete">
                             <DeleteIcon />
                           </IconButton>
                         </Tooltip>
@@ -325,7 +330,7 @@ export default function EnhancedTable({ tableHead, tableData=[] }) {
           </Table>
         </TableContainer>
         <div className={classes.flexdiv}>
-          <EnhancedTableToolbar numSelected={selected.length} />
+          <EnhancedTableToolbar selected={selected} deleteAll={handleDeleteRows} setSelected={setSelected} />
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"

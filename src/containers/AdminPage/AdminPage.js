@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 
 import Table from '../../components/Table/Table';
-import { getUsersList } from '../../store/actions/adminAction';
+import { getUsersList, deleteUsersByIds } from '../../store/actions/adminAction';
 import SearchBox from '../../components/SearchBox/SearchBox';
 import { makeStyles } from '@material-ui/core/styles';
 import { searchUserByUserInput } from '../../services/adminService';
@@ -22,7 +22,7 @@ const tableHead = [
   { id: 'action', numeric: false, disablePadding: true, label: 'Action' },
 ];
 
-function AdminPage({ getUsersListRequest, users }){
+function AdminPage({ getUsersListRequest, users, deleteUsersByIdsRequest }){
   const classes = useStyles();
   const [ searchString, setSearchString ] = useState('');
 
@@ -31,11 +31,16 @@ function AdminPage({ getUsersListRequest, users }){
       await getUsersListRequest();
     }
     getUsers();
-  }, [getUsersListRequest])
+  }, [getUsersListRequest]);
+  const handleDelete = (ids=[]) => {
+    deleteUsersByIdsRequest(ids, (message) => {
+      console.log(message);
+    })
+  }
   return (
     <div className={classes.root}>
       <SearchBox value={searchString} handleChange={setSearchString} id="userSearch" placeholder={locales.admin.searchPlaceholder} />
-      <Table tableHead={tableHead} tableData={searchUserByUserInput(searchString, users)} />
+      <Table tableHead={tableHead} tableData={searchUserByUserInput(searchString, users)} handleDeleteRows={handleDelete} />
     </div>
   )
 }
@@ -47,6 +52,7 @@ const mapStateToProps = state => ({
 export default connect(
   mapStateToProps,
   {
-    getUsersListRequest: getUsersList
+    getUsersListRequest: getUsersList,
+    deleteUsersByIdsRequest: deleteUsersByIds
   }
 )(AdminPage);

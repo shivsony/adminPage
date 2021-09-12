@@ -22,3 +22,12 @@ export const searchUserByUserInput = (searchString, users) => {
     throw error;
   }
 };
+
+export const deleteUsers = () => {
+  try {
+    const response = {status: 200}; // await api.DELETE('Delete');
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}
