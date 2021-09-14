@@ -15,7 +15,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <div className="App">
+      <div className="App" data-testid="admin-page">
         <Switch>
           <Route exact path={ROUTES.home}>
             <AdminPage />

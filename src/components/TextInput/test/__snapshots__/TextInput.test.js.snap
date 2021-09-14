@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`matchs snapshot 1`] = `
+<div
+  className="MuiInputBase-root WithStyles(ForwardRef(InputBase))-root-1"
+  onClick={[Function]}
+>
+  <input
+    className="MuiInputBase-input WithStyles(ForwardRef(InputBase))-input-2"
+    id="textinput"
+    onAnimationStart={[Function]}
+    onBlur={[Function]}
+    onChange={[Function]}
+    onFocus={[Function]}
+    type="text"
+  />
+</div>
+`;

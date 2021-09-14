@@ -1,8 +1,22 @@
-import { render, screen } from '@testing-library/react';
+import React from "react";
+import { render } from "@testing-library/react";
+import { MemoryRouter } from 'react-router-dom';
+import ReactDOM from 'react-dom';
+
 import App from './App';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-});
+
+describe("unit-test", () => {
+    it("render without crashing", () => {
+        const div = document.createElement('div');
+        const { getByTestId } = render(
+            <MemoryRouter initialEntries={['/admin']}>
+                <App />
+            </MemoryRouter>, div
+        )
+
+        let tree = getByTestId("admin-page")
+        expect(tree).toBeInTheDocument();
+        ReactDOM.unmountComponentAtNode(div);
+    })
+})
