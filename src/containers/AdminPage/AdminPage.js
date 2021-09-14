@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import {withStyles, InputBase } from '@material-ui/core';
 
 import Table from '../../components/Table/Table';
 import { getUsersList, deleteUsersByIds, updateTheUser } from '../../store/actions/adminAction';
@@ -9,6 +8,7 @@ import SearchBox from '../../components/SearchBox/SearchBox';
 import { makeStyles } from '@material-ui/core/styles';
 import { searchUserByUserInput } from '../../services/adminService';
 import locales from '../../locales/en';
+import TextInput from '../../components/TextInput/TextInput';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -17,29 +17,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const BootstrapInput = withStyles((theme) => ({
-  root: {
-    'label + &': {
-      marginTop: theme.spacing(3),
-    },
-  },
-  input: {
-    borderRadius: 4,
-    position: 'relative',
-    backgroundColor: theme.palette.background.paper,
-    border: `1px solid ${theme.palette.primary.main}`,
-    fontSize: 16,
-    padding: '5px',
-    transition: theme.transitions.create(['border-color', 'box-shadow']),
-  },
-}))(InputBase);
-
 function AdminPage({ getUsersListRequest, users, deleteUsersByIdsRequest, updateTheUserRequest }){
   const classes = useStyles();
   const [ searchString, setSearchString ] = useState('');
-  const [ editRowIndex, setEditRowIndex ] = useState(-1);
+  const [ editRowIndex, setEditRowIndex ] = useState(null);
   const [editedData, setEditedData] = useState({
-    id: -1,
+    id: null,
     name: '',
     email: '',
     role: '',
@@ -78,44 +61,36 @@ function AdminPage({ getUsersListRequest, users, deleteUsersByIdsRequest, update
   const onClickOnInput = (e, index) => {
     e.stopPropagation();
   }
-  const EditNameForm = (data, index, idKey) => {
-    if(editRowIndex === index)
-      return (
-        <BootstrapInput
-          id='name'
-          value={editedData.name}
-          onClick={onClickOnInput}
-          onChange={e => handleEditFormData(e.target.name, e.target.value)}
-          name="name" 
-        />
-      )
-    return data
+
+  const EditNameForm = (data, index) => {
+    return editRowIndex === index ?
+      <TextInput
+        id='name'
+        value={editedData.name}
+        onClick={onClickOnInput}
+        onChange={e => handleEditFormData(e.target.name, e.target.value)}
+        name="name" 
+      /> : data;
   }
-  const EditEmailForm = (data, index, idKey) => {
-    if(editRowIndex === index)
-      return (
-        <BootstrapInput
-          id='email'
-          value={editedData.email}
-          onClick={onClickOnInput}
-          onChange={e => handleEditFormData(e.target.name, e.target.value)}
-          name="email" 
-        />
-      )
-    return data
+  const EditEmailForm = (data, index) => {
+    return editRowIndex === index ?
+      <TextInput
+        id='email'
+        value={editedData.email}
+        onClick={onClickOnInput}
+        onChange={e => handleEditFormData(e.target.name, e.target.value)}
+        name="email" 
+      /> : data;
   }
   const EditRoleForm = (data, index) => {
-    if(editRowIndex === index)
-      return (
-        <BootstrapInput
-          id='role'
-          value={editedData.role}
-          onClick={onClickOnInput}
-          onChange={e => handleEditFormData(e.target.name, e.target.value)}
-          name="role" 
-        />
-      )
-    return data
+    return editRowIndex === index ?
+      <TextInput
+        id='role'
+        value={editedData.role}
+        onClick={onClickOnInput}
+        onChange={e => handleEditFormData(e.target.name, e.target.value)}
+        name="role" 
+      /> : data;
   }
   const tableHead = [
     {

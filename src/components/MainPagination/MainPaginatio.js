@@ -11,12 +11,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function MainPagination({ count, page, rowsPerPage, onPageChange }) {
+function MainPagination({ count, page, defaultPage, onPageChange }) {
   const classes = useStyles();
 
   return (
     <div className={classes.root}>
-      <Pagination count={parseInt(count/rowsPerPage)} page={page} onChange={onPageChange} showFirstButton showLastButton />
+      <Pagination defaultPage={defaultPage} count={count} page={page} onChange={onPageChange} showFirstButton showLastButton />
     </div>
   );
 }

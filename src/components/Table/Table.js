@@ -45,9 +45,9 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-const renderColumn = (index,  _, colFields, idKey) => {
+const renderColumn = (index,  _, colFields) => {
   const { id, render, } = colFields;
-  if (render) return render(_[id], index, idKey);
+  if (render) return render(_[id], index);
   return _[id];
 };
 
@@ -205,11 +205,12 @@ const useStyles = makeStyles((theme) => ({
 export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRows, handleSaveEditedData, idKey='id', handleEditRow, editRowIndex }) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
+  const [orderBy, setOrderBy] = React.useState(null);
   const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = React.useState(1);
   const dense = false;
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const totalPages = (users) => Math.ceil(users.length / rowsPerPage);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -219,7 +220,7 @@ export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRow
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = tableData.slice(page*rowsPerPage, page*rowsPerPage + rowsPerPage).map((n) => n.id);
+      const newSelecteds = stableSort(tableData, getComparator(order, orderBy)).slice((page-1)*rowsPerPage, (page-1)*rowsPerPage + rowsPerPage).map((n) => n.id);
       setSelected(newSelecteds);
       return;
     }
@@ -259,10 +260,11 @@ export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRow
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
 
-  const emptyRows = rowsPerPage - Math.min(rowsPerPage, tableData.length - page * rowsPerPage);
-  const handleDelete = (e, ids) => {
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, tableData.length - (page-1) * rowsPerPage);
+  const handleDelete = (e, id) => {
     e.stopPropagation();
-    handleDeleteRows([ids]);
+    handleDeleteRows([id]);
+    setSelected(selected.filter(item => item !== id));
   }
   const handleEdit = (e, index, data) => {
     e.stopPropagation();
@@ -298,7 +300,7 @@ export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRow
             />
             <TableBody>
               {stableSort(tableData, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .slice((page - 1) * rowsPerPage, (page -1) * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.id);
                   const labelId = `enhanced-table-checkbox-${index}`;
@@ -325,7 +327,7 @@ export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRow
                             align="left" padding="none"
                             key={`${row[idKey]}_serial_${i}`}
                           >
-                            {renderColumn(index, row, column, idKey)}
+                            {renderColumn(index, row, column)}
                           </TableCell>
                         );
                       })}
@@ -333,7 +335,7 @@ export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRow
                       {editRowIndex === index ? (
                         <span onClick={(e) => handleSave(e)} className={classes.saveButton}>Save</span>
                         ) :(
-                        <Tooltip title="Delete">
+                        <Tooltip title="Edit">
                           <IconButton onClick={(e)=>handleEdit(e, index, row)} aria-label="edit">
                             <EditIcon />
                           </IconButton>
@@ -363,9 +365,8 @@ export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRow
         <div className={classes.flexdiv}>
           <EnhancedTableToolbar selected={selected} deleteAll={handleDeleteRows} setSelected={setSelected} />
           <MainPagination
-            component="div"
-            count={tableData.length}
-            rowsPerPage={rowsPerPage}
+            count={totalPages(tableData)}
+            defaultPage={1}
             page={page}
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
