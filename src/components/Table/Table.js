@@ -250,6 +250,7 @@ export default function EnhancedTable({ tableHead, tableData=[], handleDeleteRow
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
     setSelected([]);
+    handleEdit(event, null, {});
   };
 
   const handleChangeRowsPerPage = (event) => {
