@@ -40,3 +40,12 @@ export const updateAuser = () => {
     throw error;
   }
 }
+
+export const addNewUser = () => {
+  try {
+    const response = {status: 200}; // await api.POST('add', data);
+    return response;
+  } catch (error) {
+    throw error;
+  }
+}

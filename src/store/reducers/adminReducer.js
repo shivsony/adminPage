@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { GET_USERS_LIST, DELETE_USERS_BY_IDS, UPDATE_THE_USER } from '../actionTypes/adminActionType';
+import { GET_USERS_LIST, DELETE_USERS_BY_IDS, UPDATE_THE_USER, CREATE_NEW_USER } from '../actionTypes/adminActionType';
 
 
 const initialState = {
@@ -17,6 +17,9 @@ export function admin(state = initialState, action){
         break;
       case UPDATE_THE_USER:
         draft.userList[draft.userList.findIndex(user => user.id === action.payload.id)] = action.payload;
+        break;
+      case CREATE_NEW_USER:
+        draft.userList.push(action.payload);
         break;
       default:
         return state;

@@ -1,5 +1,5 @@
-import { fetchUsers, deleteUsers, updateAuser } from '../../services/adminService';
-import { GET_USERS_LIST, DELETE_USERS_BY_IDS, UPDATE_THE_USER } from '../actionTypes/adminActionType';
+import { fetchUsers, deleteUsers, updateAuser, addNewUser } from '../../services/adminService';
+import { GET_USERS_LIST, DELETE_USERS_BY_IDS, UPDATE_THE_USER, CREATE_NEW_USER } from '../actionTypes/adminActionType';
 
 export const getUsersList = () => async (dispatch) => {
   try {
@@ -38,6 +38,22 @@ export const updateTheUser = (data, callBack) => async (dispatch) => {
     if(res.status === 200){
       dispatch({
         type: UPDATE_THE_USER,
+        payload: data,
+      });
+      callBack('successfully updated');
+    }
+  } catch(err){
+    console.log(err);
+    throw err.message;
+  }
+}
+
+export const createNewUser = (data, callBack) => async (dispatch) => {
+  try {
+    const res =  await addNewUser();
+    if(res.status === 200){
+      dispatch({
+        type: CREATE_NEW_USER,
         payload: data,
       });
       callBack('successfully updated');
